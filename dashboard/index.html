@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Ecosystem Masterclass: Interactive Sandbox</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- ================= TOP NAVBAR ================= -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <span class="brand-glow"></span>
+                <h1>Graph Ecosystem Masterclass</h1>
+                <span class="badge">Interactive Sandbox v1.0</span>
+            </div>
+            <div class="nav-actions">
+                <button id="btn-reset-graph" class="btn btn-secondary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Reset Graph
+                </button>
+                <button id="btn-load-demo" class="btn btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Load Demo Topology
+                </button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- ================= LEFT SIDEBAR (CONTROLS) ================= -->
+            <aside class="sidebar glass">
+                <div class="sidebar-section">
+                    <h2>Algorithm Control Center</h2>
+                    <p class="section-desc">Select a mathematical engine to execute in real-time over the canvas topology.</p>
+                    
+                    <div class="control-group">
+                        <label for="algo-select">Select Algorithm</label>
+                        <select id="algo-select" class="custom-select">
+                            <option value="dijkstra">Dijkstra Shortest Path</option>
+                            <option value="pagerank">PageRank Centrality</option>
+                            <option value="gcn">GCN Message Passing</option>
+                            <option value="spectral">Spectral Fiedler Partition</option>
+                        </select>
+                    </div>
+
+                    <div id="dijkstra-settings" class="algo-settings active">
+                        <div class="control-group">
+                            <label for="source-node">Source Node</label>
+                            <select id="source-node" class="custom-select-small"></select>
+                        </div>
+                        <div class="control-group">
+                            <label for="target-node">Target Node</label>
+                            <select id="target-node" class="custom-select-small"></select>
+                        </div>
+                    </div>
+
+                    <div id="pagerank-settings" class="algo-settings">
+                        <div class="control-group">
+                            <label>Damping Factor (&alpha;): <span id="damping-val">0.85</span></label>
+                            <input type="range" id="damping-slider" min="0.1" max="0.99" step="0.05" value="0.85" class="slider">
+                        </div>
+                    </div>
+
+                    <div id="gcn-settings" class="algo-settings">
+                        <p class="settings-info">Visualizes <code>scatter_add</code> message aggregation. Feature values flow from neighbors to update node states.</p>
+                    </div>
+
+                    <div id="spectral-settings" class="algo-settings">
+                        <p class="settings-info">Computes the Graph Laplacian and partition classes based on the Fiedler vector sign.</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="btn-run-algo" class="btn btn-success btn-full">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Run Visualization
+                        </button>
+                        <button id="btn-stop-algo" class="btn btn-danger btn-full" disabled>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                            Stop / Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h2>Sandbox Builder Tools</h2>
+                    <div class="tool-buttons">
+                        <button id="btn-tool-select" class="btn btn-tool active" title="Drag Nodes / Move View">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                            Select / Drag
+                        </button>
+                        <button id="btn-tool-addnode" class="btn btn-tool" title="Click Canvas to Add Node">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            Add Node
+                        </button>
+                        <button id="btn-tool-addedge" class="btn btn-tool" title="Drag from Node to Node to Connect">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            Add Edge
+                        </button>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="chk-force" checked>
+                            <span class="checkmark"></span>
+                            Enable Force-Directed Layout
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="chk-directed">
+                            <span class="checkmark"></span>
+                            Directed Graph Mode
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ================= MAIN CANVAS AREA ================= -->
+            <main class="canvas-container glass">
+                <canvas id="graph-canvas"></canvas>
+                
+                <div class="canvas-instructions">
+                    <span><strong>Left Click:</strong> Add Node / Select</span> | 
+                    <span><strong>Drag Node:</strong> Move Node</span> | 
+                    <span><strong>Drag between nodes:</strong> Link Nodes</span>
+                </div>
+            </main>
+        </div>
+
+        <!-- ================= BOTTOM CONSOLE & DIAGNOSTICS ================= -->
+        <footer class="console-panel glass">
+            <div class="panel-header">
+                <h3>Diagnostic Console & Algorithmic Parity Logs</h3>
+                <div class="console-actions">
+                    <button id="btn-clear-console" class="btn-text">Clear Logs</button>
+                </div>
+            </div>
+            <div id="console-output" class="console-body">
+                <div class="log-line system">[+] Interactive Sandbox Initialized. Drag and connect nodes, then select an algorithm to visualize.</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

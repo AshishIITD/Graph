@@ -1,0 +1,667 @@
+"""
+Graph Ecosystem Masterclass - Textbook PDF Generator
+=====================================================
+This script creates a stunning, production-grade HTML master textbook covering
+all 6 phases of the Graph curriculum with custom SVGs, LaTeX-like CSS math formula blocks,
+and complexity tables. It then compiles it to a professional PDF using headless Chrome.
+"""
+
+import os
+import subprocess
+
+def generate_html_content() -> str:
+    """Generates the comprehensive HTML source for the textbook with premium glassmorphic styling."""
+    
+    html = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Ecosystem Masterclass: From Foundations to GraphRAG & Agents (2026)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #131a2c;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-secondary: #4f46e5;
+            --accent-gradient: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
+            --emerald: #10b981;
+            --crimson: #ef4444;
+            --amber: #f59e0b;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .no-print {
+                display: none;
+            }
+            pre, code {
+                background-color: #f3f4f6 !important;
+                color: #000000 !important;
+                border: 1px solid #e5e7eb !important;
+            }
+            .chapter-card, .callout {
+                background: #f9fafb !important;
+                border: 1px solid #e5e7eb !important;
+                color: #000000 !important;
+            }
+            :root {
+                --text-primary: #000000;
+                --text-secondary: #374151;
+                --bg-primary: #ffffff;
+                --bg-secondary: #f3f4f6;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* --- Cover Page --- */
+        .cover-page {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 2px solid var(--glass-border);
+            border-radius: 24px;
+            background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-primary) 100%);
+            padding: 40px;
+            position: relative;
+            margin-bottom: 60px;
+            page-break-after: always;
+        }
+
+        .cover-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .cover-meta {
+            margin-top: auto;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* --- Global Layout --- */
+        .chapter-title {
+            font-size: 2.2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 10px;
+            page-break-before: always;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #818cf8;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            text-align: justify;
+        }
+
+        /* --- Callouts --- */
+        .callout {
+            background: var(--glass-bg);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--glass-border);
+            border-left-width: 4px;
+        }
+
+        .callout-title {
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- Code Blocks --- */
+        pre {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #38bdf8;
+        }
+
+        /* --- Math Blocks --- */
+        .math-block {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px dashed var(--accent-primary);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            color: #a5b4fc;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        /* --- Tables --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.95rem;
+            text-align: left;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        th {
+            background-color: var(--bg-secondary);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 12px 15px;
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* --- SVG Wrapper --- */
+        .diagram-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .toc-list {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px dotted var(--glass-border);
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= COVER PAGE ================= -->
+    <div class="cover-page">
+        <h1 class="cover-title">GRAPH ECOSYSTEM<br>MASTERCLASS</h1>
+        <p class="cover-subtitle">A Complete Mathematical and Engineering Guide: From Classical Spectral Graph Theory to PyTorch Deep GNNs, Knowledge Graph Factorization, and Enterprise GraphRAG Agents</p>
+        
+        <div style="color:#818cf8; margin-top:20px; font-weight:600; font-family:'Outfit'; letter-spacing: 2px;">
+            PRODUCTION-GRADE FROM-SCRATCH IMPLEMENTATIONS
+        </div>
+        
+        <div class="cover-meta">
+            <div><strong>Author:</strong> AI Engineering Specialist</div>
+            <div><strong>Format:</strong> High-Fidelity Technical Textbook</div>
+            <div><strong>Version:</strong> 2026.1</div>
+        </div>
+    </div>
+
+    <!-- ================= TABLE OF CONTENTS ================= -->
+    <h2 class="section-title">Table of Contents</h2>
+    <ul class="toc-list">
+        <li class="toc-item"><span>Chapter 1: Graph Foundations & Spectral Theory</span><strong>Page 3</strong></li>
+        <li class="toc-item"><span>Chapter 2: Canonical Graph Algorithms & Complexity Analysis</span><strong>Page 8</strong></li>
+        <li class="toc-item"><span>Chapter 3: Node Embeddings & Probabilistic Graphical Models (PGMs)</span><strong>Page 14</strong></li>
+        <li class="toc-item"><span>Chapter 4: Knowledge Graphs, Joins & Tensor Factorization (KGEs)</span><strong>Page 20</strong></li>
+        <li class="toc-item"><span>Chapter 5: Graph Deep Learning: Custom Message Passing & Generative Models</span><strong>Page 26</strong></li>
+        <li class="toc-item"><span>Chapter 6: Enterprise GraphRAG & Task-Planning Agentic Workflows</span><strong>Page 32</strong></li>
+    </ul>
+
+    <!-- ================= CHAPTER 1 ================= -->
+    <h1 class="chapter-title" id="ch1">Chapter 1: Graph Foundations & Spectral Theory</h1>
+    <p>
+        Graphs represent the most expressive and natural data structure for modeling complex, relational dependencies. 
+        Formally, a graph is defined as an ordered pair <strong>G = (V, E)</strong> where <strong>V</strong> is a set of vertices (nodes) 
+        and <strong>E &subseteq; V &times; V</strong> is a set of edges connecting pairs of vertices. 
+        Whether directed or undirected, weighted or unweighted, the representation of G dictates the computational efficiency 
+        of all downstream algorithms.
+    </p>
+
+    <h2 class="section-title">1.1 Adjacency, Incidence, and Sparse Representation</h2>
+    <p>
+        In classical graph theory, graphs are encoded in several ways, each presenting distinct trade-offs:
+    </p>
+    <ul>
+        <li><strong>Adjacency Matrix (A):</strong> An N &times; N matrix where A[i][j] represents the weight of the edge from node i to node j. Ideal for dense graphs, supporting O(1) edge lookups, but incurs a costly O(N<sup>2</sup>) space complexity.</li>
+        <li><strong>Adjacency List:</strong> An array of linked lists/dictionaries mapping each node to its immediate neighbors. This is the optimal representation for sparse graphs, requiring O(V + E) space.</li>
+        <li><strong>Incidence Matrix (M):</strong> An N &times; M matrix where rows represent nodes and columns represent edges. Used heavily in electrical network modeling and flow networks.</li>
+    </ul>
+
+    <h2 class="section-title">1.2 Brandes Centrality and PageRank Equations</h2>
+    <p>
+        To measure node importance, we derive Brandes' O(VE) Betweenness Centrality algorithm. 
+        Unlike naive O(V<sup>3</sup>) algorithms that compute all-pairs shortest paths, Brandes utilizes a backward-accumulation dependency equation:
+    </p>
+    <div class="math-block">
+        &delta;<sub>s&bull;</sub>(v) = &sum;<sub>{w | v &in; Pred(s, w)}</sub> ( &sigma;<sub>sv</sub> / &sigma;<sub>sw</sub> ) * ( 1 + &delta;<sub>s&bull;</sub>(w) )
+    </div>
+    <p>
+        Where &sigma;<sub>sv</sub> is the number of shortest paths from s to v, and Pred(s, w) is the set of predecessors of w on shortest paths from s.
+    </p>
+    <p>
+        PageRank models node importance as the stationary distribution of a Markov random walk. Incorporating a damping factor 
+        <strong>&alpha;</strong> (the probability of jumping to a random node), the PageRank vector <strong>PR</strong> converges via:
+    </p>
+    <div class="math-block">
+        PR(u) = (1 - &alpha;)/N + &alpha; * &sum;<sub>v &in; InNeighbors(u)</sub> PR(v) / OutDegree(v)
+    </div>
+
+    <h2 class="section-title">1.3 Spectral Decomposition & Fiedler Partitioning</h2>
+    <p>
+        Spectral Graph Theory connects graph topologies to linear algebra via the <strong>Laplacian Matrix L = D - A</strong>, 
+        where D is the diagonal degree matrix and A is the adjacency matrix. 
+        Because L is symmetric and positive semi-definite, its eigenvalues are real and non-negative:
+    </p>
+    <div class="math-block">
+        0 = &lambda;<sub>1</sub> &le; &lambda;<sub>2</sub> &le; ... &le; &lambda;<sub>n</sub>
+    </div>
+    <p>
+        The second smallest eigenvalue <strong>&lambda;<sub>2</sub></strong> is the <strong>Algebraic Connectivity</strong> of the graph, 
+        also known as the <strong>Fiedler value</strong>. 
+        The corresponding eigenvector <strong>u<sub>2</sub></strong> (the <strong>Fiedler vector</strong>) defines the optimal 
+        spectral bi-partition: nodes are partitioned based on whether their Fiedler coordinate is positive or negative, 
+        minimizing the ratio cut.
+    </p>
+
+    <div class="diagram-container">
+        <svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+            <line x1="50" y1="60" x2="120" y2="30" stroke="#6366f1" stroke-width="3"/>
+            <line x1="50" y1="60" x2="120" y2="90" stroke="#6366f1" stroke-width="3"/>
+            <line x1="120" y1="30" x2="120" y2="90" stroke="#6366f1" stroke-width="3"/>
+            <line x1="120" y1="60" x2="280" y2="60" stroke="#ef4444" stroke-dasharray="5,5" stroke-width="3"/>
+            <line x1="280" y1="30" x2="350" y2="60" stroke="#10b981" stroke-width="3"/>
+            <line x1="280" y1="90" x2="350" y2="60" stroke="#10b981" stroke-width="3"/>
+            <line x1="280" y1="30" x2="280" y2="90" stroke="#10b981" stroke-width="3"/>
+            <circle cx="50" cy="60" r="15" fill="#1e1a3c" stroke="#6366f1" stroke-width="3"/>
+            <circle cx="120" cy="30" r="15" fill="#1e1a3c" stroke="#6366f1" stroke-width="3"/>
+            <circle cx="120" cy="90" r="15" fill="#1e1a3c" stroke="#6366f1" stroke-width="3"/>
+            <circle cx="280" cy="30" r="15" fill="#1e1a3c" stroke="#10b981" stroke-width="3"/>
+            <circle cx="280" cy="90" r="15" fill="#1e1a3c" stroke="#10b981" stroke-width="3"/>
+            <circle cx="350" cy="60" r="15" fill="#1e1a3c" stroke="#10b981" stroke-width="3"/>
+            <text x="50" y="65" fill="#ffffff" font-family="'Outfit'" font-size="12" text-anchor="middle">A</text>
+            <text x="120" y="35" fill="#ffffff" font-family="'Outfit'" font-size="12" text-anchor="middle">B</text>
+            <text x="120" y="95" fill="#ffffff" font-family="'Outfit'" font-size="12" text-anchor="middle">C</text>
+            <text x="280" y="35" fill="#ffffff" font-family="'Outfit'" font-size="12" text-anchor="middle">D</text>
+            <text x="280" y="95" fill="#ffffff" font-family="'Outfit'" font-size="12" text-anchor="middle">E</text>
+            <text x="350" y="65" fill="#ffffff" font-family="'Outfit'" font-size="12" text-anchor="middle">F</text>
+            <text x="200" y="50" fill="#ef4444" font-family="'Outfit'" font-size="10" text-anchor="middle">Fiedler Cut</text>
+        </svg>
+    </div>
+
+
+    <!-- ================= CHAPTER 2 ================= -->
+    <h1 class="chapter-title" id="ch2">Chapter 2: Canonical Graph Algorithms & Complexity Analysis</h1>
+    <p>
+        Understanding classical graph routing and partition theory forms the foundation of modern algorithmic modeling. 
+        Here, we analyze the rigorous mathematical design and worst-case complexities of classical algorithms.
+    </p>
+    
+    <h2 class="section-title">2.1 Shortest Path Optimization: Dijkstra vs Bellman-Ford</h2>
+    <p>
+        Given a source vertex s, Dijkstra's algorithm greedily extracts the minimum distance node from a priority queue. 
+        Its runtime is bounded by <strong>O((V + E) log V)</strong>. 
+        However, Dijkstra fails on negative edge weights. 
+        For graphs with negative edges, the Bellman-Ford algorithm relaxes all edges V-1 times. 
+        If a further relaxation step decreases any distance, a negative-weight cycle is detected. 
+        Bellman-Ford operates in <strong>O(VE)</strong> time.
+    </p>
+
+    <h2 class="section-title">2.2 Network Flows: Edmonds-Karp & Dinic</h2>
+    <p>
+        The Max-Flow Min-Cut theorem states that the maximum flow through a network equals the capacity of its minimum cut. 
+        Edmonds-Karp implements this theorem by finding augmenting paths using BFS, running in <strong>O(VE<sup>2</sup>)</strong>. 
+        Dinic's algorithm improves upon this by constructing a <strong>Level Graph</strong> via BFS and computing 
+        <strong>blocking flows</strong> via DFS, reducing the complexity to <strong>O(V<sup>2</sup>E)</strong>.
+    </p>
+
+    <h2 class="section-title">2.3 Algorithmic Complexity Comparison Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Algorithm</th>
+                <th>Core Paradigm</th>
+                <th>Time Complexity</th>
+                <th>Space Complexity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Dijkstra</td>
+                <td>Greedy + Min-Priority Queue</td>
+                <td>O((V + E) log V)</td>
+                <td>O(V)</td>
+            </tr>
+            <tr>
+                <td>Bellman-Ford</td>
+                <td>Dynamic Programming (Edge Relaxation)</td>
+                <td>O(VE)</td>
+                <td>O(V)</td>
+            </tr>
+            <tr>
+                <td>Kruskal (MST)</td>
+                <td>Greedy + Union-Find (Disjoint Set)</td>
+                <td>O(E log E)</td>
+                <td>O(V)</td>
+            </tr>
+            <tr>
+                <td>Tarjan (SCC)</td>
+                <td>DFS + Node Stack Tracking</td>
+                <td>O(V + E)</td>
+                <td>O(V)</td>
+            </tr>
+            <tr>
+                <td>Dinic (Max Flow)</td>
+                <td>Level Graphs + Blocking Flows</td>
+                <td>O(V<sup>2</sup> E)</td>
+                <td>O(V + E)</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <!-- ================= CHAPTER 3 ================= -->
+    <h1 class="chapter-title" id="ch3">Chapter 3: Node Embeddings & Probabilistic Graphical Models (PGMs)</h1>
+    <p>
+        This chapter bridges the gap between discrete structural representations and continuous vector representations. 
+        We map discrete structures into dense vector spaces and model joint probability distributions over graph topologies.
+    </p>
+
+    <h2 class="section-title">3.1 Biased Random Walks (DeepWalk & Node2Vec)</h2>
+    <p>
+        Node2Vec generalizes DeepWalk by introducing two hyperparameters, <strong>p</strong> and <strong>q</strong>, 
+        to guide random walks. Given a walk that just traversed edge (t &rarr; v), the transition probability to neighbor x is scaled by:
+    </p>
+    <div class="math-block">
+        &alpha;<sub>pq</sub>(t, x) = 1/p (if d<sub>tx</sub> = 0) | 1 (if d<sub>tx</sub> = 1) | 1/q (if d<sub>tx</sub> = 2)
+    </div>
+    <p>
+        Where d<sub>tx</sub> is the shortest path distance between t and x. 
+        Parameter <strong>p</strong> controls the likelihood of returning to the previous node (favoring local, BFS-like exploration), 
+        while <strong>q</strong> controls the likelihood of moving outward (favoring global, DFS-like exploration).
+    </p>
+
+    <h2 class="section-title">3.2 Belief Propagation and Viterbi Decoding</h2>
+    <p>
+        In factor graphs, the <strong>Sum-Product Belief Propagation</strong> algorithm calculates marginal variables by passing 
+        messages along tree structures. The message from variable node x to factor node f is:
+    </p>
+    <div class="math-block">
+        &mu;<sub>x&rarr;f</sub>(x) = &prod;<sub>s &in; Neighbors(x) \ {f}</sub> &mu;<sub>s&rarr;x</sub>(x)
+    </div>
+    <p>
+        For sequential models like Hidden Markov Models, the <strong>Viterbi Algorithm</strong> uses dynamic programming to 
+        decode the most likely sequence of hidden states. It computes the max probability pathway at time t and state s:
+    </p>
+    <div class="math-block">
+        V<sub>t,s</sub> = max<sub>s'</sub> ( V<sub>t-1,s'</sub> * Transition(s' &rarr; s) ) * Emission(s &rarr; o<sub>t</sub>)
+    </div>
+
+
+    <!-- ================= CHAPTER 4 ================= -->
+    <h1 class="chapter-title" id="ch4">Chapter 4: Knowledge Graphs, Joins & Tensor Factorization (KGEs)</h1>
+    <p>
+        Knowledge Graphs represent facts as semantic triples: <strong>(Subject, Predicate, Object)</strong>. 
+        Here, we examine indexing architectures for semantic databases and mathematical scoring frameworks for relation projection.
+    </p>
+
+    <h2 class="section-title">4.1 Triple Store Indexing (SPO, POS, OSP)</h2>
+    <p>
+        To support instantaneous queries, production triple stores maintain three nested indexing registries. 
+        This guarantees that queries like <code>(?person, works_at, ?company)</code> or <code>(Google, located_in, ?loc)</code> 
+        run in O(1) time:
+    </p>
+    <ul>
+        <li><strong>SPO Index:</strong> Subject &rarr; Predicate &rarr; Set(Objects)</li>
+        <li><strong>POS Index:</strong> Predicate &rarr; Object &rarr; Set(Subjects)</li>
+        <li><strong>OSP Index:</strong> Object &rarr; Subject &rarr; Set(Predicates)</li>
+    </ul>
+
+    <h2 class="section-title">4.2 Knowledge Graph Embedding (KGE) Architectures</h2>
+    <p>
+        KGEs map entities and relations to low-dimensional vector spaces. Below, we review the mathematical formulations of several key models:
+    </p>
+    <ul>
+        <li><strong>TransE:</strong> Models relations as translations in real vector space: 
+            <div class="math-block">f(h, r, t) = - || h + r - t ||<sub>L1/L2</sub></div>
+        </li>
+        <li><strong>TransH:</strong> Projects entities onto a relation-specific hyperplane before translation:
+            <div class="math-block">h<sub>&perp;</sub> = h - w<sub>r</sub><sup>T</sup>h w<sub>r</sub> &nbsp;|&nbsp; f(h, r, t) = - || h<sub>&perp;</sub> + d<sub>r</sub> - t<sub>&perp;</sub> ||<sub>2</sub></div>
+        </li>
+        <li><strong>RotatE:</strong> Models relations as rotations in complex vector space:
+            <div class="math-block">t = h &nbsp;&bull;&nbsp; e<sup>i &theta;<sub>r</sub></sup> &nbsp;|&nbsp; f(h, r, t) = - || h &nbsp;&bull;&nbsp; r - t ||</div>
+        </li>
+        <li><strong>ComplEx:</strong> A bilinear model utilizing complex-valued embeddings to handle asymmetric relations:
+            <div class="math-block">f(h, r, t) = Re( h<sup>T</sup> diag(r) conj(t) )</div>
+        </li>
+    </ul>
+
+
+    <!-- ================= CHAPTER 5 ================= -->
+    <h1 class="chapter-title" id="ch5">Chapter 5: Graph Deep Learning: Custom Message Passing & Generative Models</h1>
+    <p>
+        Graph Neural Networks (GNNs) extend deep learning to non-Euclidean domains. 
+        We formalize GNN layers under the unified <strong>Message Passing</strong> framework.
+    </p>
+
+    <h2 class="section-title">5.1 GCN, GraphSAGE, and GAT Mechanics</h2>
+    <p>
+        A GNN layer updates node representations by propagating neighbor features:
+    </p>
+    <ul>
+        <li><strong>GCN:</strong> Performs symmetric degree normalization over self-looped neighborhoods:
+            <div class="math-block">h<sub>i</sub><sup>(l+1)</sup> = &sigma;( W &bull; &sum;<sub>j &in; N(i) &cup; {i}</sub> (1 / &radic;(d<sub>i</sub> d<sub>j</sub>)) h<sub>j</sub><sup>(l)</sup> )</div>
+        </li>
+        <li><strong>GraphSAGE:</strong> Samples local neighborhoods and aggregates features, concatenating the node's own state:
+            <div class="math-block">h<sub>i</sub><sup>(l+1)</sup> = &sigma;( W &bull; [ h<sub>i</sub><sup>(l)</sup> || Aggregate({h_j<sup>(l)</sup>, &forall; j &in; N(i)}) ] )</div>
+        </li>
+        <li><strong>GAT:</strong> Computes multi-head self-attention coefficients to dynamically weight neighbor importance:
+            <div class="math-block">&alpha;<sub>i,j</sub> = softmax<sub>j</sub>( LeakyReLU( a<sup>T</sup> [W h<sub>i</sub> || W h<sub>j</sub>] ) )</div>
+        </li>
+    </ul>
+
+    <div class="diagram-container">
+        <svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+            <line x1="70" y1="30" x2="200" y2="60" stroke="#6366f1" stroke-width="2"/>
+            <line x1="70" y1="90" x2="200" y2="60" stroke="#6366f1" stroke-width="2"/>
+            <line x1="330" y1="60" x2="200" y2="60" stroke="#6366f1" stroke-width="2"/>
+            <circle cx="70" cy="30" r="12" fill="#131a2c" stroke="#818cf8" stroke-width="2"/>
+            <circle cx="70" cy="90" r="12" fill="#131a2c" stroke="#818cf8" stroke-width="2"/>
+            <circle cx="330" cy="60" r="12" fill="#131a2c" stroke="#818cf8" stroke-width="2"/>
+            <circle cx="200" cy="60" r="20" fill="#1e1b4b" stroke="#10b981" stroke-width="3"/>
+            <text x="70" y="34" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">h_j1</text>
+            <text x="70" y="94" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">h_j2</text>
+            <text x="330" y="64" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">h_j3</text>
+            <text x="200" y="64" fill="#ffffff" font-family="'Outfit'" font-size="11" text-anchor="middle">h_i</text>
+            <text x="135" y="40" fill="#a5b4fc" font-family="'Outfit'" font-size="9" text-anchor="middle">a_ij1</text>
+            <text x="135" y="85" fill="#a5b4fc" font-family="'Outfit'" font-size="9" text-anchor="middle">a_ij2</text>
+            <text x="265" y="50" fill="#a5b4fc" font-family="'Outfit'" font-size="9" text-anchor="middle">a_ij3</text>
+        </svg>
+    </div>
+
+    <h2 class="section-title">5.2 Variational Graph Autoencoders (VGAE)</h2>
+    <p>
+        For generative graph tasks, the VGAE uses a GCN encoder to parameterize a latent node distribution 
+        <strong>q(Z | X, A) = &prod; N(z<sub>i</sub> | &mu;<sub>i</sub>, diag(&sigma;<sub>i</sub><sup>2</sup>))</strong>. 
+        It decodes the graph by reconstructing the adjacency matrix: 
+        <strong>p(A | Z) = &prod; &sigma;(z<sub>i</sub><sup>T</sup> z<sub>j</sub>)</strong>. 
+        The model is trained by maximizing the Evidence Lower Bound (ELBO):
+    </p>
+    <div class="math-block">
+        L = E<sub>q(Z|X,A)</sub>[ log p(A|Z) ] - KL( q(Z|X,A) || p(Z) )
+    </div>
+
+
+    <!-- ================= CHAPTER 6 ================= -->
+    <h1 class="chapter-title" id="ch6">Chapter 6: Enterprise GraphRAG & Task-Planning Agentic Workflows</h1>
+    <p>
+        In industrial AI, combining unstructured text search with structured knowledge graphs has led to the 
+        development of <strong>Graph-Augmented Retrieval Generation (GraphRAG)</strong>. 
+        Similarly, agents utilize graph structures to maintain long-term memory and plan execution steps.
+    </p>
+
+    <h2 class="section-title">6.1 The GraphRAG Pipeline</h2>
+    <p>
+        GraphRAG fuses vector search with multi-hop knowledge graph queries to provide deep, contextual reasoning:
+    </p>
+    <ol>
+        <li><strong>Ingestion & Extraction:</strong> Unstructured documents are chunked and embedded. A semantic parser extracts entities and relations, constructing a knowledge graph.</li>
+        <li><strong>Hybrid Retrieval:</strong> When a query is received, the system retrieves relevant text chunks via vector similarity. It then extracts key entities from these chunks and performs a multi-hop traversal of the KG to pull in adjacent facts.</li>
+        <li><strong>Grounded Generation:</strong> The retrieved text chunks and graph paths are combined into a structured prompt, providing grounding for the LLM.</li>
+    </ol>
+
+    <div class="diagram-container">
+        <svg width="450" height="130" viewBox="0 0 450 130" xmlns="http://www.w3.org/2000/svg">
+            <!-- Vector path -->
+            <rect x="20" y="20" width="90" height="40" rx="6" fill="#131a2c" stroke="#818cf8" stroke-width="2"/>
+            <text x="65" y="45" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">Vector Query</text>
+            <path d="M 110 40 L 160 40" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow)"/>
+            <rect x="160" y="20" width="90" height="40" rx="6" fill="#131a2c" stroke="#818cf8" stroke-width="2"/>
+            <text x="205" y="45" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">Top-K Chunks</text>
+            
+            <!-- Graph path -->
+            <rect x="20" y="75" width="90" height="40" rx="6" fill="#131a2c" stroke="#10b981" stroke-width="2"/>
+            <text x="65" y="100" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">Seed Entities</text>
+            <path d="M 110 95 L 160 95" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)"/>
+            <rect x="160" y="75" width="90" height="40" rx="6" fill="#131a2c" stroke="#10b981" stroke-width="2"/>
+            <text x="205" y="100" fill="#ffffff" font-family="'Outfit'" font-size="10" text-anchor="middle">Multi-hop Paths</text>
+            
+            <!-- Fusion and Generation -->
+            <path d="M 250 40 L 320 65" stroke="#818cf8" stroke-width="2"/>
+            <path d="M 250 95 L 320 65" stroke="#10b981" stroke-width="2"/>
+            <rect x="320" y="45" width="100" height="40" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="3"/>
+            <text x="370" y="70" fill="#ffffff" font-family="'Outfit'" font-size="11" font-weight="600" text-anchor="middle">Grounded LLM</text>
+        </svg>
+    </div>
+
+    <h2 class="section-title">6.2 Agent Planning (DAG Execution Graphs)</h2>
+    <p>
+        AI agents model complex workflows as Directed Acyclic Graphs (DAGs), where nodes represent executable tools 
+        and edges represent data dependencies. By performing a topological sort, the agent determines the correct 
+        execution order, ensuring that parent outputs are properly routed to downstream child tasks.
+    </p>
+
+</body>
+</html>
+"""
+    return html
+
+def main():
+    print("="*60)
+    print("GRAPH ECOSYSTEM MASTERCLASS - PDF COMPILATION ENGINE")
+    print("="*60)
+    
+    # 1. Write the textbook HTML file
+    html_path = "/home/gaian/Graph/masterclass_textbook.html"
+    print(f"[+] Writing high-fidelity textbook HTML source to: {html_path}")
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(generate_html_content())
+        
+    # 2. Compile to PDF using headless google-chrome
+    pdf_path = "/home/gaian/Graph/Graph_Ecosystem_Masterclass.pdf"
+    print(f"[+] Compiling to PDF using headless Chrome at: {pdf_path}")
+    
+    chrome_cmd = [
+        "/usr/bin/google-chrome",
+        "--headless",
+        "--no-sandbox",
+        "--disable-gpu",
+        f"--print-to-pdf={pdf_path}",
+        "--print-to-pdf-no-header",
+        html_path
+    ]
+    
+    try:
+        result = subprocess.run(chrome_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        print("[SUCCESS] PDF compiled successfully!")
+        print(f"          Output saved to: {pdf_path}")
+    except subprocess.CalledProcessError as e:
+        print("[ERROR] PDF compilation failed!")
+        print("Stderr:", e.stderr.decode())
+        print("Stdout:", e.stdout.decode())
+    except FileNotFoundError:
+        print("[ERROR] google-chrome binary not found at /usr/bin/google-chrome!")
+        
+if __name__ == "__main__":
+    main()
