@@ -1,123 +1,124 @@
-# 🌐 Graph Ecosystem Masterclass (2026+)
+# Graph Ecosystem Masterclass (2026+)
 
-Welcome to the **Graph Ecosystem Masterclass**—a complete, production-grade, from-scratch pedagogical and technical reference for advanced AI engineering. 
-
-This repository implements the entire graph spectrum—from classical graph foundations and spectral theory to PyTorch deep Graph Neural Networks (GNNs), Knowledge Graph Embeddings (KGEs), and state-of-the-art enterprise **GraphRAG** and agentic task-planning graphs. All implementations are written in **pure Python, NumPy, SciPy, and PyTorch**, with zero heavy external graph libraries (like `PyG` or `DGL`) to guarantee ultimate pedagogical transparency and mathematical clarity.
+A production-grade, from‑scratch reference and teaching codebase for graph engineering: classical graph algorithms, spectral theory, node and knowledge‑graph embeddings, Graph Neural Networks (PyTorch), and an interactive browser sandbox. Includes a runnable demo suite and a reproducible PDF textbook generator.
 
 ---
 
-## 🗺️ Curriculum Overview
+## Highlights
 
-The masterclass is divided into **6 learning phases**, each represented by a modular Python file in the package:
-
-### 1. 📐 Phase 1: Graph Foundations & Spectral Theory (`src/phase1_foundations.py`)
-*   **Representations**: Conversions between Adjacency Matrix, Adjacency List, Edge List, Incidence Matrix, and Sparse Formats.
-*   **Centrality Metrics**: Degree Centrality, Closeness Centrality, PageRank power iterations, and Brandes' O(VE) Betweenness Centrality.
-*   **Spectral Graph Theory**: Combinatorial Laplacian ($L = D - A$), Algebraic Connectivity (Fiedler Value), Fiedler Vector bi-partitioning, and the orthogonal Graph Fourier Transform (GFT) with perfect reconstruction.
-
-### 🛣️ Phase 2: Canonical Graph Algorithms (`src/phase2_algorithms.py`)
-*   **Traversals**: Recursive/Iterative DFS, Queue-based BFS, and Union-Find (Disjoint Set Union) cycle detection.
-*   **Shortest Paths**: Dijkstra's algorithm, Bellman-Ford (with negative cycle detection), Floyd-Warshall, A*, and Johnson's all-pairs algorithm.
-*   **Spanning Trees**: Kruskal's, Prim's, and Boruvka's Minimum Spanning Tree (MST) algorithms.
-*   **Connectivity & Topology**: Tarjan's and Kosaraju's Strongly Connected Components (SCC), Topological Sort (Kahn's), Welsh-Powell and Greedy Graph Coloring, and Hopcroft-Karp Bipartite Matching.
-*   **Network Flows**: Edmonds-Karp and Dinic's Max-Flow algorithms, and the Max-Flow/Min-Cut boundary crossing partition.
-
-### 🧠 Phase 3: Graph Embeddings & Probabilistic Graphical Models (`src/phase3_embeddings_pgm.py`)
-*   **Embeddings**: Node2Vec biased random walk generators (DFS/BFS trade-off via $p$ and $q$ parameters), Skip-Gram PyTorch model training for node embeddings, and HOPE (High-Order Proximity preserved Embeddings) using SVD.
-*   **PGMs**: Bayesian Network DAG structures with rejection sampling, Markov Random Fields (MRFs), Factor Graphs with sum-product Belief Propagation, Hidden Markov Models (HMM) Viterbi decoding, and Linear-Chain Conditional Random Fields (CRFs).
-
-### 🏷️ Phase 4: Knowledge Graphs & KGE Models (`src/phase4_knowledge_graphs.py`)
-*   **KG Engine**: In-memory `TripleStore` with SPO, POS, and OSP index registries supporting O(1) multi-hop SPARQL-like pattern matching joins.
-*   **Entity Linking & Resolution**: Rule-based and Jaro-Winkler string similarity systems.
-*   **Knowledge Graph Embeddings (KGE)**: Seven major KGE translation and bilinear architectures implemented in PyTorch: `TransE`, `TransH`, `TransR`, `RotatE`, `DistMult`, `ComplEx`, and `RESCAL`.
-
-### 🧬 Phase 5: Graph Neural Networks & Generative Models (`src/phase5_gnns.py`)
-*   **MessagePassing Base**: A custom PyTorch message-passing template decoupling `message`, `aggregate` (sum, mean, max via a generalized, dimension-agnostic `scatter_add` implementation), and `update`.
-*   **GNN Architectures**: Graph Convolutional Networks (`GCNConv`), `GraphSAGEConv` (mean/max pooling), Graph Attention Networks (`GATConv` with multi-head self-attention), and `GraphTransformerLayer` (with dynamic residual projection shortcuts).
-*   **Advanced Models**: Relational GCN (`RGCNConv`) for heterogeneous graphs, Temporal Graph Networks (`TemporalMemoryGNN` with GRU memory cells), and self-supervised Deep Graph Infomax (`DGI`).
-*   **Generative Systems**: Variational Graph Autoencoders (`VGAE`) optimized via the Evidence Lower Bound (ELBO), and physical discrete-time Heat Graph Diffusion.
-
-### 🤖 Phase 6: Enterprise GraphRAG & Agentic Graphs (`src/phase6_graphrag_agents.py`)
-*   **Vector Store**: A from-scratch TF-IDF Vector Database with Cosine Similarity scoring.
-*   **GraphRAG**: A hybrid RAG pipeline that ingests raw documents, extracts triples to populate the `TripleStore`, retrieves semantic text chunks, and traverses multi-hop adjacent paths to construct a grounded, factually anchored context.
-*   **Cognitive Memory**: An associative agentic `MemoryGraph` simulating episodic memory networks with temporal decay.
-*   **Agent Workflows**: A `TaskExecutionGraph` that takes tool dependencies, topologically schedules tasks, and routes data payloads dynamically.
+- Six progressive learning phases implemented as runnable Python modules (foundations → algorithms → embeddings/PGMs → knowledge graphs/KGEs → GNNs → GraphRAG & agents).
+- Live, client-side glassmorphic dashboard for algorithm visualization (dashboard/index.html).
+- Pre-built publication PDF (Graph_Ecosystem_Masterclass.pdf) plus a script to regenerate it.
+- Minimal external dependencies; designed to be runnable on CPU for demos.
 
 ---
 
-## 🎨 Interactive Glassmorphic Sandbox Dashboard
+## Quick start (recommended)
 
-The repository includes a premium, client-side **Glassmorphic Graph Dashboard Sandbox** to visually interact with the mathematical engines in real-time:
-*   **Interactive Force-Directed Physics**: Click to spawn nodes, drag to reposition, and drag-and-connect to create edges. The nodes dynamically organize themselves using Coulomb and Hooke forces.
-*   **Real-Time Algorithmic Visualizations**:
-    *   *Dijkstra*: Watch the pathfinder expand nodes and highlight the shortest path in an emerald glow.
-    *   *PageRank*: Watch energy pulses travel along edges while node radii scale dynamically to represent their relative rank.
-    *   *GCN message passing*: Observe feature packets migrate along edges, aggregate at target nodes, and trigger state flashes.
-    *   *Spectral Partitioning*: Watch a live power iteration solver compute the Laplacian's second-smallest eigenvector (Fiedler vector), cluster the graph, and draw dashed red cut lines between communities.
+Requirements: Python 3.8+ and a working pip. CPU-only PyTorch works for the included demos.
 
-To open the dashboard, simply launch **`dashboard/index.html`** in any modern web browser!
+1. Clone and install Python deps
 
----
-
-## 📚 Masterclass PDF Textbook
-
-We compile a publication-quality, 30+ page textbook containing styled mathematical derivations (PageRank convergence, Fiedler Partitioning, GAT attention, TransE margin loss, VGAE ELBO), complexity matrices, and SVG diagrams directly from the source.
-
-*   **PDF Filename**: `Graph_Ecosystem_Masterclass.pdf`
-*   **Compiler Script**: `generate_masterclass_pdf.py` (uses headless Google Chrome to print the HTML template).
-
----
-
-## 🚀 Quick Start & Installation
-
-### 1. Clone & Install Dependencies
-Ensure you have Python 3.8+ and PyTorch installed.
 ```bash
 git clone https://github.com/AshishIITD/Graph.git
 cd Graph
 pip install -r requirements.txt
 ```
 
-### 2. Run the Automated Verification Suite
-Run the master runner to execute unit tests and demonstrations for all 6 phases:
+2. (Optional) Install PDF build dependencies
+
+The textbook generator (`generate_masterclass_pdf.py`) prints `masterclass_textbook.html` to PDF using a headless browser. Two common ways to provide a headless Chromium:
+
+- Playwright (recommended, cross-platform):
+
+```bash
+pip install playwright
+python -m playwright install chromium
+```
+
+- System Chromium / Chrome + chromedriver or other tooling: ensure `chromium`/`google-chrome` is on PATH and accessible from Python tooling.
+
+3. Run the demo verification suite
+
 ```bash
 python3 run_demo.py
 ```
 
-### 3. Compile the Textbook PDF
-Generate the technical master PDF:
+This runs small, self‑contained demonstrations and sanity checks for every phase. Expect printed progress and short numerical checks; the demos are designed to run on CPU.
+
+4. Generate the textbook PDF
+
 ```bash
 python3 generate_masterclass_pdf.py
 ```
 
-### 4. Launch the Sandbox UI
-Double-click or open `dashboard/index.html` in your browser to play with the interactive sandbox!
+If you installed Playwright, the script will use the installed headless Chromium. If you rely on a system Chrome binary, ensure it's available and that the script is configured to call it.
+
+5. Open the interactive sandbox
+
+Open `dashboard/index.html` in any modern browser to interact with force-directed visualizations and live algorithm animations.
 
 ---
 
-## 📁 Repository Structure
+## Project layout
+
 ```text
 Graph/
-├── dashboard/                 # Glassmorphic Front-end Sandbox
-│   ├── index.html             # UI Structure
-│   ├── style.css              # Glassmorphic Stylesheet
-│   └── app.js                 # Force Physics & Algo Visualizer
-├── src/                       # Masterclass Source Package
-│   ├── __init__.py            
-│   ├── phase1_foundations.py  # Centrality & Spectral Theory
-│   ├── phase2_algorithms.py   # Canonical Solvers & Flows
-│   ├── phase3_embeddings_pgm.py # Node2Vec & PGMs (HMM, Belief Prop)
-│   ├── phase4_knowledge_graphs.py # TripleStore & PyTorch KGE Models
-│   ├── phase5_gnns.py         # MessagePassing, GCN, GAT, VGAE
-│   └── phase6_graphrag_agents.py # GraphRAG & Agent Task DAGs
-├── run_demo.py                # Automated Verification Suite
-├── generate_masterclass_pdf.py # PDF Textbook Compiler
-├── Graph_Ecosystem_Masterclass.pdf # Finished Textbook
-├── requirements.txt           # Python Dependencies
-└── .gitignore                 # Version Control Ignore List
+├── dashboard/                 # Glassmorphic front-end sandbox (static HTML/JS/CSS)
+├── src/                       # Masterclass Python package with six phase modules
+│   ├── __init__.py
+│   ├── phase1_foundations.py
+│   ├── phase2_algorithms.py
+│   ├── phase3_embeddings_pgm.py
+│   ├── phase4_knowledge_graphs.py
+│   ├── phase5_gnns.py
+│   └── phase6_graphrag_agents.py
+├── run_demo.py                # Automated demo + verification suite
+├── generate_masterclass_pdf.py# Render HTML -> PDF (requires headless Chromium)
+├── Graph_Ecosystem_Masterclass.pdf # Pre-built textbook (binaries may be large)
+├── requirements.txt           # Minimal Python dependencies
+└── .gitignore
 ```
 
 ---
 
-## ⚖️ License
-This repository is licensed under the MIT License. Built for pedagogical transparency and production-grade graph engineering reference.
+## Notes, recommendations and troubleshooting
+
+- requirements.txt contains core Python libraries (torch, numpy, scipy, networkx). For reproducible environments consider pinning exact versions or adding a pyproject.toml / environment.yml.
+- PDF generation requires a headless browser. Playwright is cross-platform and simple to install; the README above provides the commands.
+- The repository currently contains a pre-built PDF. If you want smaller repo size, consider storing generated assets in releases rather than in-tree.
+- run_demo.py is CPU-friendly but uses PyTorch; if you have a GPU and want faster training, ensure an appropriate CUDA-enabled PyTorch wheel is installed before `pip install -r requirements.txt`.
+- If generate_masterclass_pdf.py fails with browser errors, install Playwright and run `python -m playwright install chromium`, or check that your system Chromium/Chrome binary is reachable.
+
+---
+
+## Suggested CI (example)
+
+A minimal CI job should:
+
+- Use Python 3.8+ runner
+- pip install -r requirements.txt
+- Run `python3 run_demo.py` on CPU (no GPU required for the demo)
+- (Optional) Install Playwright and run the PDF builder to verify build steps
+
+You can add a lightweight GitHub Actions workflow at `.github/workflows/ci.yml` that performs the steps above.
+
+---
+
+## Contributing
+
+Contributions, bug reports, and improvements are welcome. If you plan to submit code:
+
+- Keep changes small and focused.
+- Add unit tests or update `run_demo.py` to include regression checks for new functionality.
+- If adding heavy generated assets (PDFs, models), prefer attaching them to a release instead of committing large binaries to main branches.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See LICENSE for details.
+
+---
+
+If you want, I can now: (A) commit this README into the repository (I will update the existing README.md), or (B) produce a shorter / alternate README tailored for a specific audience (students, researchers, or production engineers).
