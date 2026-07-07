@@ -1,6 +1,6 @@
 # Graph Ecosystem Masterclass (2026+)
 
-A production-grade, from‑scratch reference and teaching codebase for graph engineering: classical graph algorithms, spectral theory, node and knowledge‑graph embeddings, Graph Neural Networks (PyTorch), and an interactive browser sandbox. Includes a runnable demo suite and a reproducible PDF textbook generator.
+A production-grade, from‑scratch reference and teaching codebase for graph engineering: classical graph algorithms, spectral theory, node and knowledge‑graph embeddings, Graph Neural Networks ([...])
 
 ---
 
@@ -114,11 +114,3 @@ Contributions, bug reports, and improvements are welcome. If you plan to submit 
 - If adding heavy generated assets (PDFs, models), prefer attaching them to a release instead of committing large binaries to main branches.
 
 ---
-
-## License
-
-This project is licensed under the MIT License. See LICENSE for details.
-
----
-
-If you want, I can now: (A) commit this README into the repository (I will update the existing README.md), or (B) produce a shorter / alternate README tailored for a specific audience (students, researchers, or production engineers).
