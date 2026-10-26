@@ -633,13 +633,13 @@ def main():
     print("="*60)
     
     # 1. Write the textbook HTML file
-    html_path = "/home/gaian/Graph/masterclass_textbook.html"
+    html_path = "/home/Ashish/Graph/masterclass_textbook.html"
     print(f"[+] Writing high-fidelity textbook HTML source to: {html_path}")
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(generate_html_content())
         
     # 2. Compile to PDF using headless google-chrome
-    pdf_path = "/home/gaian/Graph/Graph_Ecosystem_Masterclass.pdf"
+    pdf_path = "/home/Ashish/Graph/Graph_Ecosystem_Masterclass.pdf"
     print(f"[+] Compiling to PDF using headless Chrome at: {pdf_path}")
     
     chrome_cmd = [
